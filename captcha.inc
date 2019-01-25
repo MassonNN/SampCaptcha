@@ -263,9 +263,24 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 4: return SetTimerEx(captcha_func_to_call, 100, false, "d", playerid);
 				default: SendClientMessage(playerid, -1, CAPTCHA_KICKED), return Kick(playerid);
 			}	
+
+			DestroyCaptcha(playerid);
+			
 			#endif
 		}
-		new id = GetPVarInt(playerid, "Captcha_Quest");
+		new id = GetPVarInt(playerid, "Captcha_Quest"); 
+		if(sizeof(inputtext) > sizeof(captcha_Answers[id]) + 2) // Если введенный текст больше ответа на 2 символа, то..
+		{
+			switch (captcha_exec) // решаем наказание
+			{
+				case 2: SendClientMessage(playerid, -1, CAPTCHA_BANNED), return Ban(playerid);
+				case 3: return 1;
+				case 4: return SetTimerEx(captcha_func_to_call, 100, false, "d", playerid);
+				default: SendClientMessage(playerid, -1, CAPTCHA_KICKED), return Kick(playerid);
+			}	
+
+			DestroyCaptcha(playerid); // Уничтожаем капчу, чтобы не нагружать сервер оставшейся
+		}
 		if(strcmp(inputtext, captcha_Answers [id], true)) return 1;
 		else 
 		{
@@ -281,6 +296,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				default: SendClientMessage(playerid, -1, CAPTCHA_KICKED), return Kick(playerid);
 			}	
 			#endif
+
+			DestroyCaptcha(playerid);
 		}
 	}
 
