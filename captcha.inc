@@ -229,10 +229,31 @@ forward GenerateCaptchaDialog (playerid), public GenerateCaptchaDialog(playerid)
 
 	for(new i; i < sizeof(captcha_Txt[playerid]); i++) TextDrawShowForPlayer(playerid, captcha_Txt [playerod] [i]);
 
+	#if defined CAPTCHA_AntiNop
+		SetPVarInt(playerid, "captcha_AntiNOP_protection", 1);
+		SetTimerEx("captchaCheckNOP", 100, false, "d", playerid);
+	#endif
+
 	return 1;
 
 }
 
+#if defined CAPTCHA_AntiNop
+	forward captchaCheckNOP(playerid), public captchaCheckNOP(playerid)
+	{
+		if(GetPVarInt(playerid, "captcha_AntiNOP_protection"))
+		{
+			switch (captcha_exec) 
+			{
+				case 2: SendClientMessage(playerid, -1, CAPTCHA_BANNED), Ban(playerid);
+				case 3: DestroyCaptcha(playerid), return 1;
+				case 4: SetTimerEx(captcha_func_to_call, 100, false, "d", playerid);
+				default: SendClientMessage(playerid, -1, CAPTCHA_KICKED), Kick(playerid);
+			}	
+
+			return DestroyCaptcha(playerid);
+		} 
+	}
 #endif
 
 forward DestroyCaptcha(playerid), public DestroyCaptcha(playerid)
@@ -247,7 +268,7 @@ forward DestroyCaptcha(playerid), public DestroyCaptcha(playerid)
 
 public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 {
-    
+    SetPVarInt(playerid, "captcha_AntiNop_protection", 0);
 	if (dialogid == CAPTCHA_DIALOG)
 	{
 		if(!response) // если нажал ESC
@@ -258,10 +279,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 			switch (captcha_exec) // решаем наказание
 			{
-				case 2: SendClientMessage(playerid, -1, CAPTCHA_BANNED), return Ban(playerid);
-				case 3: return 1;
-				case 4: return SetTimerEx(captcha_func_to_call, 100, false, "d", playerid);
-				default: SendClientMessage(playerid, -1, CAPTCHA_KICKED), return Kick(playerid);
+				case 2: SendClientMessage(playerid, -1, CAPTCHA_BANNED), Ban(playerid);
+				case 3: DestroyCaptcha(playerid), return 1;
+				case 4: SetTimerEx(captcha_func_to_call, 100, false, "d", playerid);
+				default: SendClientMessage(playerid, -1, CAPTCHA_KICKED), Kick(playerid);
 			}	
 
 			DestroyCaptcha(playerid);
@@ -273,13 +294,13 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		{
 			switch (captcha_exec) // решаем наказание
 			{
-				case 2: SendClientMessage(playerid, -1, CAPTCHA_BANNED), return Ban(playerid);
-				case 3: return 1;
-				case 4: return SetTimerEx(captcha_func_to_call, 100, false, "d", playerid);
-				default: SendClientMessage(playerid, -1, CAPTCHA_KICKED), return Kick(playerid);
+				case 2: SendClientMessage(playerid, -1, CAPTCHA_BANNED), Ban(playerid);
+				case 3: DestroyCaptcha(playerid), return 1;
+				case 4: SetTimerEx(captcha_func_to_call, 100, false, "d", playerid);
+				default: SendClientMessage(playerid, -1, CAPTCHA_KICKED), Kick(playerid);
 			}	
 
-			DestroyCaptcha(playerid); // Уничтожаем капчу, чтобы не нагружать сервер оставшейся
+			DestroyCaptcha(playerid);
 		}
 		if(strcmp(inputtext, captcha_Answers [id], true)) return 1;
 		else 
@@ -290,14 +311,14 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 			switch (captcha_exec) // решаем наказание
 			{
-				case 2: SendClientMessage(playerid, -1, CAPTCHA_BANNED), return Ban(playerid);
-				case 3: return 1;
-				case 4: return SetTimerEx(captcha_func_to_call, 100, false, "d", playerid);
-				default: SendClientMessage(playerid, -1, CAPTCHA_KICKED), return Kick(playerid);
+				case 2: SendClientMessage(playerid, -1, CAPTCHA_BANNED), Ban(playerid);
+				case 3: DestroyCaptcha(playerid), return 1;
+				case 4: SetTimerEx(captcha_func_to_call, 100, false, "d", playerid);
+				default: SendClientMessage(playerid, -1, CAPTCHA_KICKED), Kick(playerid);
 			}	
 			#endif
-
-			DestroyCaptcha(playerid);
+			
+			return DestroyCaptcha(playerid);
 		}
 	}
 
