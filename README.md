@@ -1,2 +1,3 @@
 # SampCaptcha
-Captcha for Samp Servers
+Captcha для SAMP серверов.
+
